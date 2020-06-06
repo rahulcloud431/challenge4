@@ -1,0 +1,26 @@
+node('AWS'){
+    stage('build'){
+	      git url: 'https://github.com/wakaleo/game-of-life.git'
+        sh 'mvn clean package'
+	      sh ' cp ./gameoflife-web/target/gameoflife.war gameoflife.war'
+        stash name: 'goljar', includes: 'gameoflife.war'
+    }
+}
+node('AZURE'){
+    stage('deploydev'){
+        unstash 'goljar'
+        sh 'sudo cp ./gameoflife.war /var/lib/tomcat8/webapps'
+        sh 'sudo service tomcat8 restart'
+    }
+}
+node('UBUNTU'){
+    stage('infraprov'){
+        unstash 'goljar'
+    	  sh 'git clone https://github.com/rahulcloud431/challenge4.git'
+    	  sh 'cp ./challenge4/main.tf ./main.tf'
+	      sh 'cp ./challenge4/provider.tf ./provider.tf'
+	      sh 'cp ./challenge4/terrafom.pem ./terrafom.pem'
+        sh 'terraform init'
+        sh 'terraform apply -auto-approve'
+    }
+}
