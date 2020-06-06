@@ -1,8 +1,8 @@
 node('AWS'){
     stage('build'){
-	      git url: 'https://github.com/wakaleo/game-of-life.git'
+	git url: 'https://github.com/wakaleo/game-of-life.git'
         sh 'mvn clean package'
-	      sh ' cp ./gameoflife-web/target/gameoflife.war gameoflife.war'
+	sh ' cp ./gameoflife-web/target/gameoflife.war gameoflife.war'
         stash name: 'goljar', includes: 'gameoflife.war'
     }
 }
@@ -16,10 +16,10 @@ node('AZURE'){
 node('UBUNTU'){
     stage('infraprov'){
         unstash 'goljar'
-    	  sh 'git clone https://github.com/rahulcloud431/challenge4.git'
-    	  sh 'cp ./challenge4/main.tf ./main.tf'
-	      sh 'cp ./challenge4/provider.tf ./provider.tf'
-	      sh 'cp ./challenge4/terrafom.pem ./terrafom.pem'
+    	sh 'git clone https://github.com/rahulcloud431/challenge4.git'
+    	sh 'cp ./challenge4/main.tf ./main.tf'
+	sh 'cp ./challenge4/provider.tf ./provider.tf'
+	sh 'cp ./challenge4/terrafom.pem ./terrafom.pem'
         sh 'terraform init'
         sh 'terraform apply -auto-approve'
     }
